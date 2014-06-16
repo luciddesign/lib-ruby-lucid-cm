@@ -1,6 +1,5 @@
 require 'faraday'
 require 'rack'
-require 'digest'
 require 'json'
 require 'pathname'
 
