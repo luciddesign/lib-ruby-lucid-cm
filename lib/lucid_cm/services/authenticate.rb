@@ -6,7 +6,7 @@ require 'pathname'
 module LucidCM
   class Authenticate
 
-    attr_accessor :options
+    attr_reader :data, :options
 
     def initialize( options = {} )
       @options = _default_options.merge( options )
@@ -18,7 +18,7 @@ module LucidCM
       response = Faraday.post _token_uri.to_s, _token_params( code )
       json     = JSON.parse( response.body )
 
-      %w{ access_token refresh_token expires_in }.map do |attr|
+      @data = %w{ access_token refresh_token expires_in }.map do |attr|
         json[attr]
       end
     end
