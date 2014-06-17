@@ -15,12 +15,11 @@ module LucidCM
     # eg. at, rt, ex = auth.request_token( params['code'] )
     #
     def request_token( code )
-      response = Faraday.post _token_uri.to_s, _token_params( code )
-      json     = JSON.parse( response.body )
+      _request _token_params( code )
+    end
 
-      @data = %w{ access_token refresh_token expires_in }.map do |attr|
-        json[attr]
-      end
+    def request_refresh( token )
+      _request _refresh_params( token )
     end
 
     # Redirect user here for authorization.
@@ -30,6 +29,15 @@ module LucidCM
     end
 
     private
+
+    def _request( params )
+      response = Faraday.post _token_uri.to_s, params
+      json     = JSON.parse( response.body )
+
+      @data = %w{ access_token refresh_token expires_in }.map do |attr|
+        json[attr]
+      end
+    end
 
     def _default_options
       {
@@ -60,6 +68,13 @@ module LucidCM
         :client_secret => options[:client_secret],
         :redirect_uri  => options[:callback_uri],
         :code          => code
+      }
+    end
+
+    def _refresh_params( token )
+      {
+        :grant_type    => 'refresh_token',
+        :refresh_token => token
       }
     end
 
