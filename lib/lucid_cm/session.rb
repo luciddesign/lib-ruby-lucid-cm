@@ -8,10 +8,10 @@ class LucidCM::Session < LucidClient::Session
     super( options )
   end
 
-  # +shop+ must implement +#token+.
+  # +model+ must implement +#token+.
   #
-  def self.for_shop( shop, options = {} )
-    options.merge!( :token => shop.token )
+  def self.for_model( model, options = {} )
+    options.merge!( :token => model.token )
 
     new( options )
   end
