@@ -30,9 +30,10 @@ module LucidCM::Middleware
     end
 
     def _raise_for( code )
-      raise LucidCM::Exceptions::InvalidToken.new( code ).tap do |e|
-        log_error( e.message )
-      end
+      e = LucidCM::Exceptions::InvalidToken.new( code )
+      log_error( e.message )
+
+      raise e
     end
 
   end
