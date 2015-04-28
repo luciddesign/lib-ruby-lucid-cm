@@ -1,7 +1,7 @@
 require 'json'
 
 module LucidCM::Middleware
-  class Token < LucidCM::Middleware::Base
+  class Token < Base
 
     def call( env )
       app.call( env ).on_complete do |env|
@@ -23,9 +23,14 @@ module LucidCM::Middleware
     private
 
     def _code( env )
-      JSON.parse( env[:body] || '{}' )['Code']
+      b = _body( env )
+
+      b['Code'] if b.kind_of?( Hash )
+    end
+
+    def _body( env )
+      JSON.parse( env[:body] )
     rescue JSON::ParserError
-      nil
     end
 
     def _unauthorized?( env )
