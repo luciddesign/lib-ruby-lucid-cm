@@ -5,23 +5,31 @@ module LucidCM::Middleware
 
     def call( env )
       app.call( env ).on_complete do |env|
-        if _access_token_error?( env )
-          log_error( msg = 'Campaign Monitor rejected the token' )
+        code = _code( env )
 
-          raise LucidCM::Exceptions::InvalidToken, msg
+        break unless _unauthorized?( env )
+        break unless _token_codes.include?( code )
+
+        begin
+          raise LucidCM::Exceptions::InvalidToken.new( code )
+        rescue => e
+          log_error( e.message )
+
+          raise e
         end
       end
     end
 
     private
 
-    # There's a little more to it than this, so see Campaign Monitor docs.
-    # But for now, this should be fine.
-    #
-    def _access_token_error?( env )
-      if env[:status] == 401
-        env[:body] && _token_codes.include?( JSON.parse( env[:body] )['Code'] )
-      end
+    def _code( env )
+      JSON.parse( env[:body] || '{}' )['Code']
+    rescue JSON::ParserError
+      nil
+    end
+
+    def _unauthorized?( env )
+      env[:status] == 401
     end
 
     def _token_codes
