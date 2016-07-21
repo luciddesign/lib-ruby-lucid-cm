@@ -23,7 +23,7 @@ class LucidCM::Session < LucidClient::Session
   private
 
   def _middleware
-    %i{ CallLogger Token }.map do |middleware|
+    %i{ Retry CallLogger Token }.map do |middleware|
       LucidCM::Middleware.const_get( middleware )
     end
   end
